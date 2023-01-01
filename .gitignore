@@ -1,0 +1,29 @@
+# vs code artifacts 
+.vscode/
+
+# Semaphore secrets
+**/.env
+
+# homassisant
+/home/mini/dell_mini/home_assisant/config/secrets.yaml
+.cloud/
+.storage/
+backups/
+deps/
+nest/
+tts/
+secrets.yaml
+*.log
+*.log.*
+*.db
+*.db-shm
+*.db-wal
+
+#portainer
+./docker/portainer/portainer-data/**
+*.key
+*.pem
+
+#heimdall
+**/log/
+**/keys/
