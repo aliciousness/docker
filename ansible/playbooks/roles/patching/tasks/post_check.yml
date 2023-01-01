@@ -1,0 +1,140 @@
+---
+############################################################
+#                     Post-Update Check                    #
+############################################################
+#   Make sure the services from the pre check are running  #
+#   and send the output result to a report file.           #
+############################################################
+- block:
+    - name: ' Make sure the services from the pre-check are running '
+      service:
+        name: '{{ item }}'
+        state: started
+      when: ansible_facts.services[item]['state'] == "running"
+      loop: '{{ ansible_facts.services.keys() }}'
+      register: start_failed
+    ###############################################################################
+    # Create a report in a delegate server " LOCALHOST " in case everything is OK #
+    ###############################################################################
+    - name: 'Creating a report when starting the services successfully done'
+      lineinfile:
+        line: 'HOSTNAME: {{ ansible_hostname }}-{{ ansible_default_ipv4["address"] }} | {{ item }} : OK '
+        dest: '{{ local_dir }}/update/{{ ansible_hostname }}-{{ ansible_default_ipv4["address"] }}.OK.{{ timestamp }}'
+        create: yes
+      # delegate_to: localhost
+      when: ansible_facts.services[item]['state'] == "running" and start_failed is not failed
+      loop: '{{ ansible_facts.services.keys() }}'
+  ##############################################################################
+  # Create a failed report in a delegate server " LOCALHOST "  in case there   #
+  #          one or more service failed to start after the reboot              #
+  ##############################################################################
+  rescue:
+    - name: send Error msg if starting service failed
+      lineinfile:
+        line: 'HOSTNAME: {{ ansible_hostname }}-{{ ansible_default_ipv4["address"] }} | {{ item.item }}.service : Please check'
+        dest: '{{ local_dir }}/update/{{ ansible_hostname }}-{{ ansible_default_ipv4["address"] }}.FAILED.{{ timestamp }}'
+        create: yes
+      # delegate_to: localhost
+      when:
+        - item.skipped is not defined
+        - item.state is not defined
+        - item.failed == true
+      loop: '{{ start_failed.results }}'
+#####################################################################
+##    Collect the system distribution and version after update      #
+#####################################################################
+- name: 'Gather facts after update'
+  setup:
+    #filter: ansible_distribution*
+####################################################################
+#     Make sure SELinux status does not changed after reboot       #
+####################################################################
+- block:
+    - name: ' Assert that the SElinux status is OK '
+      assert:
+        that: ansible_selinux['status'] == selinux_status
+    - name: 'Creating a report when the SELinux is OK'
+      lineinfile:
+        line: 'HOSTNAME: {{ ansible_hostname }}-{{ ansible_default_ipv4["address"] }} | SELinux: OK '
+        dest: '{{ local_dir }}/update/{{ ansible_hostname }}-{{ ansible_default_ipv4["address"] }}.OK.{{ timestamp }}'
+        create: yes
+      # delegate_to: localhost
+  rescue:
+    - name: 'Send error msg if SELinux status changed'
+      lineinfile:
+        line: 'HOSTNAME: {{ ansible_hostname }}-{{ ansible_default_ipv4["address"] }} | *SELinux status changed*'
+        dest: '{{ local_dir }}/update/{{ ansible_hostname }}-{{ ansible_default_ipv4["address"] }}.FAILED.{{ timestamp }}'
+        create: yes
+      # delegate_to: localhost
+#####################################################################
+- name: 'Set post update os info'
+  set_fact:
+    os_info_post_update:
+      distribution: '{{ ansible_distribution }}'
+      distribution_major_version: '{{ ansible_distribution_major_version }}'
+      distribution_release: '{{ ansible_distribution_release }}'
+      distribution_version: '{{ ansible_distribution_version }}'
+      kernel_version: '{{ ansible_kernel }}'
+- name: 'current OS version information AFTER the update'
+  blockinfile:
+    block: |
+      "HOSTNAME: {{ ansible_hostname }}-{{ ansible_default_ipv4["address"] }} version AFTER the update:"
+      "      distribution: {{ os_info_post_update.distribution  }} "
+      "      distribution_major_version: {{ os_info_post_update.distribution_major_version }}"
+      "      distribution_release: {{ os_info_post_update.distribution_release }}"
+      "      distribution_version: {{ os_info_post_update.distribution_version }}"
+      "      kernel_version: {{ os_info_post_update.kernel_version }}"
+    dest: '{{ local_dir }}/update/{{ ansible_hostname }}-{{ ansible_default_ipv4["address"] }}.AFTER.{{ timestamp }}'
+    create: yes
+  # delegate_to: localhost
+######################################################################
+#                    Show Summary Report                             #
+######################################################################
+- name: set_fact
+  set_fact:
+    final_report: '{{ local_dir }}/summary.{{ timestamp }}'
+
+- name: make summary file
+  shell: 'touch {{ local_dir }}/summary.{{ timestamp }}'
+
+- name: Merge update file {{ local_dir }}/update/{{ ansible_hostname }}-{{ ansible_default_ipv4["address"]}}.BEFORE.{{ timestamp }}
+  shell: 'cat {{ local_dir }}/update/{{ ansible_hostname }}-{{ ansible_default_ipv4["address"]}}.BEFORE.{{ timestamp }} >> {{ local_dir }}/summary.{{ timestamp }}'
+
+- name: Merge update file {{ local_dir }}/update/{{ ansible_hostname }}-{{ ansible_default_ipv4["address"]}}.apt.{{ timestamp }}
+  shell: 'cat {{ local_dir }}/update/{{ ansible_hostname }}-{{ ansible_default_ipv4["address"]}}.apt.{{ timestamp }} >> {{ local_dir }}/summary.{{ timestamp }}'
+  when: 'ansible_os_family == "Debian"'
+
+- block:
+    - name: Merge update file {{ local_dir }}/update/{{ ansible_hostname }}-{{ ansible_default_ipv4["address"]}}.FAILED.{{ timestamp }}
+      shell: 'cat {{ local_dir }}/update/{{ ansible_hostname }}-{{ ansible_default_ipv4["address"]}}.FAILED.{{ timestamp }} >> {{ local_dir }}/summary.{{ timestamp }}'
+      register: failures_exist
+      ignore_errors: true
+  rescue:
+    - name: 'RESCUED : No failures'
+      debug:
+        msg: 'NO {{ local_dir }}/update/{{ ansible_hostname }}-{{ ansible_default_ipv4["address"]}}.FAILED.{{ timestamp }} FILE EXIST, MEANING NO FAILURES AT THIS TIME'
+
+- name: Merge update file {{ local_dir }}/update/{{ ansible_hostname }}-{{ ansible_default_ipv4["address"]}}.AFTER.{{ timestamp }}
+  shell: 'cat {{ local_dir }}/update/{{ ansible_hostname }}-{{ ansible_default_ipv4["address"]}}.AFTER.{{ timestamp }} >> {{ local_dir }}/summary.{{ timestamp }}'
+
+- name: ' Read the file {{ local_dir }}/summary.{{ timestamp }}'
+  shell: 'cat  {{ local_dir }}/summary.{{ timestamp }}'
+  # delegate_to: localhost
+  register: final_report
+
+- name: 'show report'
+  debug:
+    msg:
+      - 'PATCHING REPORT FOR : {{ ansible_hostname }}-{{ ansible_default_ipv4["address"] }}'
+      - '{{ final_report.stdout_lines }}'
+  # delegate_to: localhost
+
+- name: create tar for report
+  archive:
+    path: '{{ local_dir }}'
+    format: gz
+    dest: '{{ local_dir }}.tgz'
+    group: root
+    owner: ANSIBLE
+    mode: 0551
+    remove: 'yes'

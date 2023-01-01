@@ -1,0 +1,11 @@
+---
+# tasks file for patching
+
+- name: Create Ansible user
+  user:
+    name: ANSIBLE
+    groups: root
+    update_password: on_create
+    password: "{{ upassword | password_hash('sha512') }}"
+    register: ansible_user_exist
+    notify: add_ssh_key

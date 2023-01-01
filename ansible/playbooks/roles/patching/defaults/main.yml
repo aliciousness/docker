@@ -1,0 +1,11 @@
+---
+# defaults file for patching
+
+patch_display_patch_output: True
+patch_reboot_message: 'Rebooting system due to patching.'
+patch_pkgs:
+  - '*'
+patch_never_reboot: False
+patch_never_restart_svc: False
+local_dir: '/home/ANSIBLE/sys-patching/{{ timestamp }}'
+kernel_upgrade_debian: false

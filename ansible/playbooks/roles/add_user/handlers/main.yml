@@ -1,0 +1,21 @@
+---
+# handlers file for patching
+- block:
+    - name: add ssh key
+      listen: add_ssh_key
+      authorized_key:
+        user: ANSIBLE
+        key: '{{ public_ssh_key }}'
+
+    - name: add usoders file
+      listen: add_ssh_key
+      copy:
+        src: files/sudoer_ansible
+        dest: /etc/suoders.d/ANSIBLE
+        owner: root
+        group: root
+        mode: 0440
+
+  when:
+    - ansible_user_exist.changed == true
+    - ansible_os_family == "Debian"

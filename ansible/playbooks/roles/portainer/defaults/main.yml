@@ -1,0 +1,11 @@
+---
+# defaults file for portainer
+
+dependencies:
+  - docker
+  - python3-pip
+
+pip:
+  - docker
+  - requests
+  - ansible

@@ -1,0 +1,7 @@
+---
+################## Playbook for patching role ##########
+
+- hosts: '{{ host }}'
+  become: true
+  roles:
+    - role: patching

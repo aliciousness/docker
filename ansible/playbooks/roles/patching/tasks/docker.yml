@@ -1,0 +1,8 @@
+- name: Copy script
+  copy:
+    src: ./files/update.sh
+    dest: ./files/update.sh
+    mode: 0777
+
+- name: Run docker update script
+  cmd: sh ./files/update.sh

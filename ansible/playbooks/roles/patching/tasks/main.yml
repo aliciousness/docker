@@ -1,0 +1,28 @@
+---
+# tasks file for patching
+- name: Get timestamp from the system
+  shell: 'date +%Y-%m-%d-%H'
+  register: tstamp
+
+- name: 'set patching_time'
+  set_fact:
+    timestamp: '{{ "{{ tstamp.stdout[0:10]}}{{ tstamp.stdout[10:] }}H" }}'
+  run_once: true
+
+- name: Run pre-check tasks
+  include_tasks:
+    file: ./pre_check.yml
+
+- name: Run update tasks for ubuntu/debian machines
+  include_tasks:
+    file: ./update_debian.yml
+  when:
+    - ansible_os_family == "Debian"
+
+- name: Run docker update tasks
+  include_tasks:
+    file: ./docker.yml
+
+- name: Run post-check tasks
+  include_tasks:
+    file: ./post_check.yml

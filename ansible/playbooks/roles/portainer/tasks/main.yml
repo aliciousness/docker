@@ -1,0 +1,85 @@
+---
+# tasks file for portainer
+
+- name: Update apt cache
+  apt:
+    update_cache: yes
+    cache_valid_time: 3600
+
+- name: Upgrade all apt packages
+  apt:
+    upgrade: dist
+
+- name: 'Ensure latest version of services is installed for portainer'
+  apt:
+    name: '{{ item }}'
+    state: latest
+  register: dependencies
+  retries: 3
+  with_items: '{{ dependencies }}'
+  until: 'dependencies is succeeded'
+
+- name: Install python SDKs
+  pip:
+    name: '{{ item }}'
+    state: latest
+  with_items: '{{ pip }}'
+  register: pip
+  retries: 3
+  until: 'pip is succeeded'
+
+- name: install community.docker for ansible
+  cmd: ansible-galaxy collection install community.docker
+
+- name: Create portainer container
+  docker_container:
+    name: portainer
+    image: portainer/portainer-ce
+    state: started
+    recreate: yes
+    restart_policy: always
+    published_ports:
+      - '8000:8000'
+      - '9000:9000'
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - portainer_data:/data
+
+# - name: Create heimdall container
+#   docker_container:
+#     name: heimdall
+#     image: linuxserver/heimdall
+#     state: started
+#     env:
+#       TZ: 'America/NewYork'
+#       PUID: 1000
+#       PGID: 1000
+#     recreate: yes
+#     restart_policy: always
+#     published_ports:
+#       - '80:80'
+#       - '443:443'
+#     volumes:
+#       - /var/run/docker.sock:/var/run/docker.sock
+#       - /home/{{ ansible_hostname }}/dell_mini/heimdall:/config
+
+# FIREWALL SETUP
+- name: Open Portainer port
+  ufw:
+    state: enabled
+    rule: allow
+    port: '8000'
+    proto: tcp
+
+- name: Open heimdall port
+  ufw:
+    state: enabled
+    rule: allow
+    port: '80'
+    proto: tcp
+# - name: Open SSH port
+#   ufw:
+#     state: enabled
+#     rule: allow
+#     port: '22'
+#     proto: tcp
