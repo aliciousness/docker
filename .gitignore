@@ -18,6 +18,8 @@ secrets.yaml
 *.db
 *.db-shm
 *.db-wal
+## Themes
+node_modules
 
 #portainer
 ./docker/portainer/portainer-data/**
