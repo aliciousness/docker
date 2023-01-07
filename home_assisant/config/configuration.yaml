@@ -10,6 +10,9 @@ panel_iframe:
 # Loads default set of integrations. Do not remove.
 default_config:
 
+#PowerCalc
+powercalc:
+
 # Load frontend themes from the themes folder
 frontend:
   themes: !include_dir_merge_named themes
@@ -21,3 +24,40 @@ tts:
 automation: !include automations.yaml
 script: !include scripts.yaml
 scene: !include scenes.yaml
+
+# System Monitor
+sensor:
+  - platform: systemmonitor
+    resources:
+      - type: disk_use_percent
+        arg: /config
+      - type: memory_free
+      - type: disk_free
+      - type: memory_use_percent
+      - type: processor_use
+      - type: processor_temperature
+
+# logger
+logger:
+  default: warning
+  logs:
+    custom_components.powercalc: debug
+
+# MQTT Discovery
+# mqtt_discoverystream:
+#   base_topic: test_HA
+#   publish_attributes: false
+#   publish_timestamps: true
+#   publish_discovery: true
+#   include:
+#     entities:
+#       - sensor.owm_hourly_humidity
+#       - sensor.jellyfin_cloud
+#       - light.wled_esp
+#   exclude:
+#     entities:
+#       - sensor.plug_xiaomi_1_electrical_measurement
+
+spotcast:
+  sp_dc: !secret sp_dc
+  sp_key: !secret sp_key
