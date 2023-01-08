@@ -1,7 +1,0 @@
----
-################## Playbook for portainer role ##########
-
-- hosts: '{{ host }}'
-  become: true
-  roles:
-    - role: portainer

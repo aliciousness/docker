@@ -1,7 +1,0 @@
----
-################## Playbook for patching role ##########
-
-- hosts: {{ host }}
-  become: true
-  roles:
-    - roles: add_user
