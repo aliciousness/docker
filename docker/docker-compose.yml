@@ -37,60 +37,54 @@ services:
       - 80:80
       - 443:443
     restart: unless-stopped
-#   # uncomment this section and comment out the mysql section to use postgres instead of mysql
-#   #postgres:
-#   #restart: unless-stopped
-#   #ports:
-#   #- 5432:5432
-#   #image: postgres:14
-#   #hostname: postgres
-#   #volumes:
-#   #  - semaphore-postgres:/var/lib/postgresql/data
-#   #environment:
-#   #  POSTGRES_USER: semaphore
-#   #  POSTGRES_PASSWORD: semaphore
-#   #  POSTGRES_DB: semaphore
-#   # comment this section out if you wish to use postgres
-#   mysql:
-#     restart: unless-stopped
-#     ports:
-#       - 3306:3306
-#     image: mysql:8.0
-#     hostname: mysql
-#     volumes:
-#       - semaphore-mysql:/home/mini/dell_mini/semaphore/mysql
-#     environment:
-#       MYSQL_RANDOM_ROOT_PASSWORD: 'yes'
-#       MYSQL_DATABASE: semaphore
-#       MYSQL_USER: semaphore
-#       MYSQL_PASSWORD: $MYSQL_PASSWORD
-#   semaphore:
-#     restart: unless-stopped
-#     ports:
-#       - 3000:3000
-#     image: semaphoreui/semaphore:latest
-#     environment:
-#       SEMAPHORE_DB_USER: semaphore
-#       SEMAPHORE_DB_PASS: semaphore
-#       SEMAPHORE_DB_HOST: mysql #change to postgres for postgres
-#       SEMAPHORE_DB_PORT: 3306 # change to 5432 for postgres
-#       SEMAPHORE_DB_DIALECT: mysql
-#       SEMAPHORE_DB: semaphore # change to semaphore?sslmode=disable for postgres
-#       SEMAPHORE_PLAYBOOK_PATH: /home/mini/dell_mini/semaphore/playbook
-#       SEMAPHORE_ADMIN_PASSWORD: $SEMAPHORE_ADMIN_PASSWORD
-#       SEMAPHORE_ADMIN_NAME: richard
-#       SEMAPHORE_ADMIN_EMAIL: craddockrichard09@gmail.com
-#       SEMAPHORE_ADMIN: admin
-#       SEMAPHORE_ACCESS_KEY_ENCRYPTION: $SEMAPHORE_ACCESS_KEY_ENCRYPTION
-#       SEMAPHORE_LDAP_ACTIVATED: 'no' # set to yes if you wish to use ldap
-#       SEMAPHORE_LDAP_HOST: dc01.local.example.com
-#       SEMAPHORE_LDAP_PORT: '636'
-#       SEMAPHORE_LDAP_NEEDTLS: 'yes'
-#       SEMAPHORE_LDAP_DN_BIND: 'uid=bind_user,cn=users,cn=accounts,dc=local,dc=shiftsystems,dc=net'
-#       SEMAPHORE_LDAP_PASSWORD: 'ldap_bind_account_password'
-#       SEMAPHORE_LDAP_DN_SEARCH: 'dc=local,dc=example,dc=com'
-#       SEMAPHORE_LDAP_SEARCH_FILTER: "(\u0026(uid=%s)(memberOf=cn=ipausers,cn=groups,cn=accounts,dc=local,dc=example,dc=com))"
-#     depends_on:
-#       - mysql #change to postgres for postgres
-# volumes:
-#   semaphore-mysql: #switch to semaphore-postgres to use postgres
+  # uncomment this section and comment out the mysql section to use postgres instead of mysql
+  # postgres:
+  #   restart: unless-stopped
+  #   ports:
+  #     - 5432:5432
+  #   image: postgres:14
+  #   hostname: postgres
+  #   volumes:
+  #     - /home/mini/dell_mini/semaphore/postrgres:/config
+  #     # - semaphore-postgres:/var/lib/postgresql/data
+  #   environment:
+  #     POSTGRES_USER: semaphore
+  #     POSTGRES_PASSWORD: $POSTGRES_PASSWORD
+  #     POSTGRES_DB: semaphore
+
+  # comment this section out if you wish to use postgres
+  mysql:
+    restart: unless-stopped
+    ports:
+      - 3306:3306
+    image: mysql:8.0
+    hostname: mysql
+    volumes:
+      - semaphore-mysql:/home/mini/dell_mini/semaphore/mysql/data
+    environment:
+      MYSQL_RANDOM_ROOT_PASSWORD: 'yes'
+      MYSQL_DATABASE: semaphore
+      MYSQL_USER: semaphore
+      MYSQL_PASSWORD: $MYSQL_PASSWORD
+  semaphore:
+    restart: unless-stopped
+    ports:
+      - 3000:3000
+    image: semaphoreui/semaphore:latest
+    environment:
+      SEMAPHORE_DB_USER: semaphore
+      SEMAPHORE_DB_PASS: $MYSQL_PASSWORD
+      SEMAPHORE_DB_HOST: mysql #chamysql for postgres
+      SEMAPHORE_DB_PORT: 3306 # change to 5432 for postgres mysql 3306
+      SEMAPHORE_DB_DIALECT: mysql
+      SEMAPHORE_DB: semaphore # change to semaphore?sslmode=disable for postgres
+      SEMAPHORE_PLAYBOOK_PATH: /home/mini/dell_mini/semaphore/playbook
+      SEMAPHORE_ADMIN_PASSWORD: $SEMAPHORE_ADMIN_PASSWORD
+      SEMAPHORE_ADMIN_NAME: richard
+      SEMAPHORE_ADMIN_EMAIL: craddockrichard09@gmail.com
+      SEMAPHORE_ADMIN: admin
+      SEMAPHORE_ACCESS_KEY_ENCRYPTION: $SEMAPHORE_ACCESS_KEY_ENCRYPTION
+    depends_on:
+      - mysql #change to postgres for postgres
+volumes:
+  semaphore-mysql: #switch to semaphore-postgres to use postgres
