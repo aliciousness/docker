@@ -18,7 +18,7 @@ services:
     container_name: homeassistant
     image: 'ghcr.io/home-assistant/home-assistant:stable'
     volumes:
-      - /home/mini/dell_mini/home_assisant/config:/config
+      - $HOME/dell_mini/dell_mini//home_assisant/config:/config
       - /etc/localtime:/etc/localtime:ro
     restart: unless-stopped
     privileged: true
@@ -32,7 +32,7 @@ services:
       - PGID=1000
       - TZ=Europe/London
     volumes:
-      - /home/mini/dell_mini/heimdall/config:/config
+      - $HOME/dell_mini/heimdall/config:/config
     ports:
       - 80:80
       - 443:443
@@ -45,7 +45,7 @@ services:
   #   image: postgres:14
   #   hostname: postgres
   #   volumes:
-  #     - /home/mini/dell_mini/semaphore/postrgres:/config
+  #     - $HOME/dell_mini/semaphore/postrgres:/config
   #     # - semaphore-postgres:/var/lib/postgresql/data
   #   environment:
   #     POSTGRES_USER: semaphore
@@ -60,7 +60,7 @@ services:
     image: mysql:8.0
     hostname: mysql
     volumes:
-      - semaphore-mysql:/home/mini/dell_mini/semaphore/mysql/data
+      - semaphore-mysql:$HOME/dell_mini/semaphore/mysql/data
     environment:
       MYSQL_RANDOM_ROOT_PASSWORD: 'yes'
       MYSQL_DATABASE: semaphore
@@ -78,7 +78,7 @@ services:
       SEMAPHORE_DB_PORT: 3306 # change to 5432 for postgres mysql 3306
       SEMAPHORE_DB_DIALECT: mysql
       SEMAPHORE_DB: semaphore # change to semaphore?sslmode=disable for postgres
-      SEMAPHORE_PLAYBOOK_PATH: /home/mini/dell_mini/semaphore/playbook
+      SEMAPHORE_PLAYBOOK_PATH: $HOME/dell_mini/semaphore/playbook
       SEMAPHORE_ADMIN_PASSWORD: $SEMAPHORE_ADMIN_PASSWORD
       SEMAPHORE_ADMIN_NAME: richard
       SEMAPHORE_ADMIN_EMAIL: craddockrichard09@gmail.com
@@ -86,5 +86,27 @@ services:
       SEMAPHORE_ACCESS_KEY_ENCRYPTION: $SEMAPHORE_ACCESS_KEY_ENCRYPTION
     depends_on:
       - mysql #change to postgres for postgres
-volumes:
-  semaphore-mysql: #switch to semaphore-postgres to use postgres
+  volumes:
+    semaphore-mysql: #switch to semaphore-postgres to use postgres
+  guacamole:
+    image: guacamole/guacamole
+    container_name: guacamole
+    hostname: guacamole
+    restart: unless-stopped
+    networks:
+      - local
+    environment:
+      GUACD_HOSTNAME: guacd
+      GUACD_PORT: 4822
+    depends_on:
+      - guacd
+    volumes:
+      - $HOME/dell_mini/guacamole/guacamole-data:/data
+  guacd:
+    image: guacamole/guacd
+    restart: unless-stopped
+    networks:
+      - local
+  networks:
+    local:
+      name: local
