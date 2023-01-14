@@ -21,11 +21,18 @@ secrets.yaml
 ## Themes
 node_modules
 
-#portainer
+# portainer
 ./docker/portainer/portainer-data/**
 *.key
 *.pem
+*.cert
 
-#heimdall
+# heimdall
 **/log/
 **/keys/
+
+# postgres
+guacamole/data/
+
+# mysql
+mysql_data/

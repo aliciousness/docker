@@ -1,5 +1,7 @@
 version: '3.0'
-
+networks:
+  guacnetwork:
+    driver: bridge
 services:
   portainer:
     container_name: portainer
@@ -18,7 +20,7 @@ services:
     container_name: homeassistant
     image: 'ghcr.io/home-assistant/home-assistant:stable'
     volumes:
-      - $HOME/dell_mini/dell_mini//home_assisant/config:/config
+      - /home/mini/dell_mini/home_assisant/config:/config
       - /etc/localtime:/etc/localtime:ro
     restart: unless-stopped
     privileged: true
@@ -32,81 +34,51 @@ services:
       - PGID=1000
       - TZ=Europe/London
     volumes:
-      - $HOME/dell_mini/heimdall/config:/config
+      - /home/mini/dell_mini/heimdall/config:/config
     ports:
       - 80:80
       - 443:443
     restart: unless-stopped
-  # uncomment this section and comment out the mysql section to use postgres instead of mysql
-  # postgres:
+  # guacd:
+  #   image: guacamole/guacd
+  #   container_name: guac
+  #   networks:
+  #     guacnetwork:
   #   restart: unless-stopped
   #   ports:
-  #     - 5432:5432
-  #   image: postgres:14
-  #   hostname: postgres
+  #     - '4822:4822'
+  # mysql:
+  #   image: mysql:latest
+  #   container_name: mysql
+  #   networks:
+  #     guacnetwork:
+  #   restart: unless-stopped
+  #   ports:
+  #     - '3306:3306'
   #   volumes:
-  #     - $HOME/dell_mini/semaphore/postrgres:/config
-  #     # - semaphore-postgres:/var/lib/postgresql/data
+  #     - /home/mini/dell_mini/mysql/mysql_data:/var/lib/mysql
+  #     - ./init:/docker-entrypoint-initdb.d:z
   #   environment:
-  #     POSTGRES_USER: semaphore
-  #     POSTGRES_PASSWORD: $POSTGRES_PASSWORD
-  #     POSTGRES_DB: semaphore
-
-  # comment this section out if you wish to use postgres
-  mysql:
-    restart: unless-stopped
-    ports:
-      - 3306:3306
-    image: mysql:8.0
-    hostname: mysql
-    volumes:
-      - semaphore-mysql:$HOME/dell_mini/semaphore/mysql/data
-    environment:
-      MYSQL_RANDOM_ROOT_PASSWORD: 'yes'
-      MYSQL_DATABASE: semaphore
-      MYSQL_USER: semaphore
-      MYSQL_PASSWORD: $MYSQL_PASSWORD
-  semaphore:
-    restart: unless-stopped
-    ports:
-      - 3000:3000
-    image: semaphoreui/semaphore:latest
-    environment:
-      SEMAPHORE_DB_USER: semaphore
-      SEMAPHORE_DB_PASS: $MYSQL_PASSWORD
-      SEMAPHORE_DB_HOST: mysql #chamysql for postgres
-      SEMAPHORE_DB_PORT: 3306 # change to 5432 for postgres mysql 3306
-      SEMAPHORE_DB_DIALECT: mysql
-      SEMAPHORE_DB: semaphore # change to semaphore?sslmode=disable for postgres
-      SEMAPHORE_PLAYBOOK_PATH: $HOME/dell_mini/semaphore/playbook
-      SEMAPHORE_ADMIN_PASSWORD: $SEMAPHORE_ADMIN_PASSWORD
-      SEMAPHORE_ADMIN_NAME: richard
-      SEMAPHORE_ADMIN_EMAIL: craddockrichard09@gmail.com
-      SEMAPHORE_ADMIN: admin
-      SEMAPHORE_ACCESS_KEY_ENCRYPTION: $SEMAPHORE_ACCESS_KEY_ENCRYPTION
-    depends_on:
-      - mysql #change to postgres for postgres
-  volumes:
-    semaphore-mysql: #switch to semaphore-postgres to use postgres
-  guacamole:
-    image: guacamole/guacamole
-    container_name: guacamole
-    hostname: guacamole
-    restart: unless-stopped
-    networks:
-      - local
-    environment:
-      GUACD_HOSTNAME: guacd
-      GUACD_PORT: 4822
-    depends_on:
-      - guacd
-    volumes:
-      - $HOME/dell_mini/guacamole/guacamole-data:/data
-  guacd:
-    image: guacamole/guacd
-    restart: unless-stopped
-    networks:
-      - local
-  networks:
-    local:
-      name: local
+  #     MYSQL_ROOT_PASSWORD: $MYSQL_ROOT_PASSWORD
+  #     MYSQL_DATABASE: guacamole
+  #     MYSQL_USER: guacamole
+  #     MYSQL_PASSWORD: $GUACAMOLE_USER_PASSWORD
+  # guacamole:
+  #   image: guacamole/guacamole
+  #   container_name: guacamole
+  #   networks:
+  #     guacnetwork:
+  #   restart: unless-stopped
+  #   ports:
+  #     - '8080:8080'
+  #   environment:
+  #     GUACD_HOSTNAME: guac
+  #     MYSQL_HOSTNAME: mysql
+  #     MYSQL_DATABASE: guacamole
+  #     MYSQL_USER: guacamole
+  #     MYSQL_PASSWORD: $GUACAMOLE_USER_PASSWORD
+  #   links:
+  #     - guacd
+  #     - mysql
+  #   volumes:
+  #     - /home/mini/dell_mini/guacamole/guacamole_data:/data
