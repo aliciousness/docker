@@ -26,7 +26,7 @@ node_modules
 *.key
 *.pem
 *.cert
-
+*.crt
 # heimdall
 **/log/
 **/keys/
@@ -36,3 +36,6 @@ guacamole/data/
 
 # mysql
 mysql_data/
+
+# tailscale
+tailscale/

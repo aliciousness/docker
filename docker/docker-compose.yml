@@ -2,6 +2,8 @@ version: '3.0'
 networks:
   guacnetwork:
     driver: bridge
+  rustdesk-net:
+    external: false
 services:
   portainer:
     container_name: portainer
@@ -63,22 +65,45 @@ services:
   #     MYSQL_DATABASE: guacamole
   #     MYSQL_USER: guacamole
   #     MYSQL_PASSWORD: $GUACAMOLE_USER_PASSWORD
-  # guacamole:
-  #   image: guacamole/guacamole
-  #   container_name: guacamole
-  #   networks:
-  #     guacnetwork:
-  #   restart: unless-stopped
-  #   ports:
-  #     - '8080:8080'
-  #   environment:
-  #     GUACD_HOSTNAME: guac
-  #     MYSQL_HOSTNAME: mysql
-  #     MYSQL_DATABASE: guacamole
-  #     MYSQL_USER: guacamole
-  #     MYSQL_PASSWORD: $GUACAMOLE_USER_PASSWORD
-  #   links:
-  #     - guacd
-  #     - mysql
-  #   volumes:
-  #     - /home/mini/dell_mini/guacamole/guacamole_data:/data
+  guacamole:
+    image: oznu/guacamole
+    container_name: guacamole
+    networks:
+      guacnetwork:
+    restart: unless-stopped
+    ports:
+      - '8080:8080'
+    environment:
+      EXTENSIONS: auth-totp
+    volumes:
+      - /home/mini/dell_mini/guacamole/guacamole_data:/config
+
+  hbbs:
+    container_name: rustdeck-hbbs
+    ports:
+      - 21115:21115
+      - 21116:21116
+      - 21116:21116/udp
+      - 21118:21118
+    image: rustdesk/rustdesk-server:latest
+    command: hbbs -r example.com:21117
+    volumes:
+      - /home/mini/dell_mini/rustdeck/hbbs:/root
+    networks:
+      - rustdesk-net
+    depends_on:
+      - hbbr
+    restart: unless-stopped
+
+  hbbr:
+    container_name: rustdeck-hbbr
+    ports:
+      - 21117:21117
+      - 21119:21119
+    image: rustdesk/rustdesk-server:latest
+    command: hbbr
+    volumes:
+      - /home/mini/dell_mini/rustdeck/hbbr:/root
+    networks:
+      - rustdesk-net
+    restart: unless-stopped
