@@ -9,8 +9,9 @@ services:
     container_name: portainer
     image: portainer/portainer-ce:latest
     restart: unless-stopped
-    security_opt:
-      - no-new-privileges:true
+    privileged: true
+      # security_opt:
+      # - no-new-privileges:true
     volumes:
       - /etc/localtime:/etc/localtime:ro
       - /var/run/docker.sock:/var/run/docker.sock:ro
@@ -18,15 +19,15 @@ services:
     ports:
       - 9000:9000
 
-  homeassistant:
-    container_name: homeassistant
-    image: 'ghcr.io/home-assistant/home-assistant:stable'
-    volumes:
-      - /home/mini/dell_mini/home_assisant/config:/config
-      - /etc/localtime:/etc/localtime:ro
-    restart: unless-stopped
-    privileged: true
-    network_mode: host
+        #  homeassistant:
+        #container_name: homeassistant
+        # image: 'ghcr.io/home-assistant/home-assistant:stable'
+        # volumes:
+        # - /home/mini/dell_mini/home_assisant/config:/config
+        # - /etc/localtime:/etc/localtime:ro
+        # restart: unless-stopped
+        # privileged: true
+        # network_mode: host
 
   heimdall:
     image: lscr.io/linuxserver/heimdall:latest
@@ -41,30 +42,7 @@ services:
       - 80:80
       - 443:443
     restart: unless-stopped
-  # guacd:
-  #   image: guacamole/guacd
-  #   container_name: guac
-  #   networks:
-  #     guacnetwork:
-  #   restart: unless-stopped
-  #   ports:
-  #     - '4822:4822'
-  # mysql:
-  #   image: mysql:latest
-  #   container_name: mysql
-  #   networks:
-  #     guacnetwork:
-  #   restart: unless-stopped
-  #   ports:
-  #     - '3306:3306'
-  #   volumes:
-  #     - /home/mini/dell_mini/mysql/mysql_data:/var/lib/mysql
-  #     - ./init:/docker-entrypoint-initdb.d:z
-  #   environment:
-  #     MYSQL_ROOT_PASSWORD: $MYSQL_ROOT_PASSWORD
-  #     MYSQL_DATABASE: guacamole
-  #     MYSQL_USER: guacamole
-  #     MYSQL_PASSWORD: $GUACAMOLE_USER_PASSWORD
+
   guacamole:
     image: oznu/guacamole
     container_name: guacamole
@@ -107,3 +85,4 @@ services:
     networks:
       - rustdesk-net
     restart: unless-stopped
+

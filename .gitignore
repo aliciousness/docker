@@ -22,7 +22,7 @@ secrets.yaml
 node_modules
 
 # portainer
-docker/portainer/
+docker/portainer/portainer-data/
 *.key
 *.pem
 *.cert
