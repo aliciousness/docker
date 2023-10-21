@@ -5,7 +5,7 @@
 **/.env
 
 # homassisant
-/home/mini/dell_mini/home_assisant/config/secrets.yaml
+dell_mini/home_assisant/config/secrets.yaml
 .cloud/
 .storage/
 backups/
@@ -22,7 +22,7 @@ secrets.yaml
 node_modules
 
 # portainer
-./docker/portainer/portainer-data/**
+docker/portainer/
 *.key
 *.pem
 *.cert
