@@ -1,0 +1,19 @@
+version: '3.0'
+networks:
+  guacnetwork:
+    driver: bridge
+volumes:
+  guacamole-data:
+services:
+  guacamole:
+    image: oznu/guacamole
+    container_name: guacamole
+    networks:
+      guacnetwork:
+    restart: unless-stopped
+    ports:
+      - '8080:8080'
+    environment:
+      EXTENSIONS: auth-totp
+    volumes:
+      - /home/docker/data/guacamole/guacamole-data:/config

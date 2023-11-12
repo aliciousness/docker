@@ -1,0 +1,55 @@
+version: '3.0'
+networks:
+  seafile-net:
+volumes:
+  data:
+  mysql_data:
+services:
+  seafile:
+    image: seafileltd/seafile:latest
+    container_name: seafile
+    restart: unless-stopped
+    environment:
+      - SEAFILE_SERVER_HOSTNAME=docker.cuscus-mountain.ts.net
+      - DB_HOST=db
+      - DB_ROOT_PASSWD=$MYSQL_ROOT_PASSWORD  
+      # - TIME_ZONE=America/New_York  # Optional, default is UTC. Should be uncomment and set to your local time zone.
+      - SEAFILE_ADMIN_EMAIL=$SEAFILE_ADMIN_EMAIL 
+      - SEAFILE_ADMIN_PASSWORD=$SEAFILE_ADMIN_PASSWORD     
+      - SEAFILE_SERVER_LETSENCRYPT=false  
+    volumes:
+      - data:/shared
+    ports:
+      - "8000:80"
+      - "8082:8082"
+    networks:
+      - seafile-net
+    depends_on:
+      - db
+      - memcached
+    env_file:
+      - .env
+
+  memcached:
+    image: memcached:1.6.18
+    container_name: seafile-memcached
+    entrypoint: memcached -m 256
+    restart: unless-stopped
+    networks:
+      - seafile-net
+
+  db:
+    image: mariadb:10.5
+    container_name: seafile-db
+    restart: unless-stopped
+    environment:
+      - MYSQL_ROOT_PASSWORD=$MYSQL_ROOT_PASSWORD
+      - MYSQL_PASSWORD=$MYSQL_PASSWORD
+      - MYSQL_DATABASE=seafile
+      - MYSQL_USER=seafile
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks:
+      - seafile-net
+    env_file:
+      - .env
