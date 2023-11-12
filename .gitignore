@@ -39,3 +39,7 @@ mysql_data/
 
 # tailscale
 tailscale/
+
+# packer 
+# credientials.*
+*.test.*
