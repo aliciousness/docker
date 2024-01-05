@@ -12,8 +12,8 @@ services:
       - "443:443/tcp"
     environment:
       TZ: 'America/New_York'
-      WEBPASSWORD: 'your_password' # Set your password or remove for a random one
-      SERVERIP: 'your_server_ip' # Set your server IP
+      WEBPASSWORD: $PASSWORD # Set your password or remove for a random one
+      SERVERIP: $SERVER_IP # Set your server IP
       DHCP_ACTIVE: 'true' # Enable DHCP server
       DHCP_START: '192.168.0.100' # Set DHCP range start
       DHCP_END: '192.168.0.250' # Set DHCP range end
