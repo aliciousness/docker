@@ -41,6 +41,6 @@ mysql_data/
 tailscale/
 
 # packer 
-*credentials*
+credentials*
 *test*
 
