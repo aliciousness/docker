@@ -11,3 +11,4 @@
 - [Seafile](docker/rustdesk/docker-compose.yaml)
 - [SonarQube](docker/sonarqube/docker-compose.yaml)
 - [WatchTower](docker/watch-tower/docker-compose.yml)
+- [Ansible Semaphore](docker/semaphore/docker-compose.yaml)

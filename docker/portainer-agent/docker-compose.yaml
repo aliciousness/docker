@@ -2,7 +2,7 @@ version: '3'
 
 services:
   portainer_agent:
-    image: portainer/agent:latest
+    image: portainer/agent:2.19.4 # need to be inline with your portainer host version
     container_name: portainer_agent
     restart: always
     ports:
