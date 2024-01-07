@@ -3,6 +3,7 @@ version: '3.8'
 services:
   semaphore:
     build: .
+    name: semaphore
     ports:
       - "3000:3000"
     environment:
