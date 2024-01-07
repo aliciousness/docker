@@ -28,7 +28,7 @@ RUN mkdir /tmp/semaphore
 COPY config/.config.json /opt/semaphore/config.json
 
 # Copy the entrypoint script into the container
-COPY config/entrypoint.sh /usr/local/bin/entrypoint.sh
+COPY config/entry-point.sh /usr/local/bin/entrypoint.sh
 RUN chmod +x /usr/local/bin/entrypoint.sh
 
 # Expose port 3000

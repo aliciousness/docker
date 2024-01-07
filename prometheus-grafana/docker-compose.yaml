@@ -17,9 +17,11 @@ services:
       - 3000:3000
     restart: unless-stopped
     environment:
-      - GF_SECURITY_ADMIN_USER=admin
-      - GF_SECURITY_ADMIN_PASSWORD=$GRAFANA_PASSWD
+      GF_SECURITY_ADMIN_USER: admin
+      GF_SECURITY_ADMIN_PASSWORD: $GRAFANA_PASSWD
     volumes:
       - ./grafana:/etc/grafana/provisioning/datasources
+    env_file:
+      - .env
 volumes:
   prom_data:
