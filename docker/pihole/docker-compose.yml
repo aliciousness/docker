@@ -1,28 +1,32 @@
 version: "3"
-
+volumes:
+  etc_pihole-unbound:
+  etc_pihole_dnsmasq-unbound:
 services:
   pihole:
     container_name: pihole
-    image: pihole/pihole:latest
+    image: cbcrowe/pihole-unbound:latest
+    hostname: ${HOSTNAME}
+    domainname: ${DOMAIN_NAME}
     ports:
-      - "53:53/tcp"
-      - "53:53/udp"
-      - "67:67/udp" # Only required for DHCP server
-      - "80:80/tcp"
-      - "443:443/tcp"
+      - 53:53/tcp
+      - 53:53/udp
+      - 22/tcp
+      - 80:80/tcp
+      - 443:443/tcp
     environment:
       TZ: 'America/New_York'
       WEBPASSWORD: $PASSWORD # Set your password or remove for a random one
-      SERVERIP: $SERVER_IP # Set your server IP
-      DHCP_ACTIVE: 'true' # Enable DHCP server
-      DHCP_START: '192.168.0.100' # Set DHCP range start
-      DHCP_END: '192.168.0.250' # Set DHCP range end
-      DHCP_ROUTER: '192.168.0.1' # Set your router IP
-      DHCP_LEASETIME: '24' # Lease time in hours
-      PIHOLE_DOMAIN: 'lan' # Local domain name
+      FTLCONF_LOCAL_IPV4: ${FTLCONF_LOCAL_IPV4}
+      WEBTHEME: ${WEBTHEME:-default-light}
+      REV_SERVER: ${REV_SERVER:-false}
+      REV_SERVER_TARGET: ${REV_SERVER_TARGET}
+      REV_SERVER_DOMAIN: ${REV_SERVER_DOMAIN}
+      REV_SERVER_CIDR: ${REV_SERVER_CIDR}
+      PIHOLE_DNS_: 27.0.0.1#5335
+      DNSSEC: "true"
+      DNSMASQ_LISTENING: single
     volumes:
-       - './etc-pihole/:/etc/pihole/'
-       - './etc-dnsmasq.d/:/etc/dnsmasq.d/'
-    cap_add:
-      - NET_ADMIN
+      - etc_pihole-unbound:/etc/pihole:rw
+      - etc_pihole_dnsmasq-unbound:/etc/dnsmasq.d:rw
     restart: unless-stopped

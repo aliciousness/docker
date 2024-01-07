@@ -1,0 +1,19 @@
+version: '3.8'
+
+services:
+  semaphore:
+    build: .
+    ports:
+      - "3000:3000"
+    environment:
+      MYSQL_ROOT_PASSWORD: $MYSQL_ROOT_PASSWORD
+      MYSQL_DATABASE: $MYSQL_DATABASE
+    volumes:
+      - ./config:/opt/semaphore/config
+      - semaphore_data:/var/lib/mysql
+    restart: unless-stopped
+    env_file:
+      - .env
+
+volumes:
+  semaphore_data:

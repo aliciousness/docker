@@ -1,46 +1,12 @@
 # vs code artifacts 
 .vscode/
 
-# Semaphore secrets
+# Environment Variables
 **/.env
-
-# homassisant
-dell_mini/home_assisant/config/secrets.yaml
-.cloud/
-.storage/
-backups/
-deps/
-nest/
-tts/
-secrets.yaml
-*.log
-*.log.*
-*.db
-*.db-shm
-*.db-wal
-## Themes
-node_modules
-
-# portainer
-docker/portainer/portainer-data/
-*.key
-*.pem
-*.cert
-*.crt
-# heimdall
-**/log/
-**/keys/
-
-# postgres
-guacamole/data/
-
-# mysql
-mysql_data/
-
-# tailscale
-tailscale/
 
 # packer 
 credentials*
 *test*
 
+# Semaphore Config
+.config.json
