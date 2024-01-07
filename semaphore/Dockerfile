@@ -7,7 +7,7 @@ ENV MYSQL_DATABASE=semaphore
 
 # Install wget, sudo, python3, python3-pip, and mysql-server
 RUN apt-get update && apt-get upgrade -y && \
-    apt-get install -y wget sudo python3 python3-pip mysql-server
+    apt-get install -y wget sudo python3 python3-pip mysql-server curl
 
 # Install jq for JSON processing
 RUN apt-get install -y jq
